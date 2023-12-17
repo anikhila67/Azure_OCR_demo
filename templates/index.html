@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.2/pdf.min.js"></script>
+    <title>BANK STATEMENT OCR</title>
+    <style>
+        .container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: start;
+            margin-bottom: 50px;
+        }
+
+        .main {
+            display: flex;
+            margin-left: 230px;
+            font-size: 15px;
+            font-family: Sans-serif;
+        }
+
+        .input {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            /* height: 320px;
+            width: 500px; */
+            margin-left: 200px;
+            /* border: 2.8px dashed; */
+            border-radius: 15px;
+            margin-top: 25px;
+            margin: 5px;
+
+            /* background-color: #ececec; */
+        }
+
+        .icon {
+            height: 30px;
+        }
+
+        .drag-div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .list {
+            justify-content: space-around;
+            width: 700px;
+            display: flex;
+            margin-left: 50px;
+            margin-top: 50px;
+        }
+
+        .list .listHeader {
+            color: #2566ae;
+            font-size: 16px;
+            font-family: 'Open Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            font-family: 'Roboto', sans-serif;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-weight: 500;
+        }
+
+        .split {
+            margin-top: 70px;
+            height: 100%;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .left {
+            left: 0;
+            width: 50%;
+            background-color: transparent;
+        }
+
+        .right {
+            right: 0;
+            width: 50%;
+            background-color: transparent
+        }
+
+        .cheque {
+            margin-top: 10px;
+            display: flex;
+            margin-left: 30px;
+            font-size: 10px;
+            font-family: Sans-serif;
+            flex-direction: column;
+        }
+
+        .cheque>p {
+            font-size: 15px;
+        }
+
+        .output>a>h1 {
+            font-size: 15px;
+            padding-left: 30px;
+            font-family: Sans-serif;
+            color: #2566ae;
+        }
+
+        #pTag {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 200;
+        }
+
+        #btn {
+            color: black;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-weight: 200;
+            border-color: black;
+        }
+
+        .button {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #btn:hover {
+            background-color: black;
+            color: #fff;
+        }
+
+        .table {
+            width: 70%;
+        }
+
+        #the-canvas {
+            border: 2px dashed black;
+            height: 100%;
+            width: 700px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn {
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .canvas{
+            width: 800px;
+  height: 100%;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  margin-left: 10px;
+        }
+
+
+        table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 95%;
+  
+  
+}
+
+table,td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  border: 1px solid black;
+  align-items: center;
+  justify-content: center;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+    </style>
+
+</head>
+
+
+<body>
+    <div class="container">
+        <!-- <div class="header">
+            <img src="Logo.jpg" alt="Logo" height="100" width="200" />
+        </div> -->
+        <div class="split left">
+            <div class="main">
+                <h2>BANK STATEMENT OCR</h2>
+            </div>
+            <div class="input">
+                <div class="upload-btn-wrapper">
+                    <button class="btn">Upload a file</button>
+                    <input type="file" id="files" name="file" />
+                    
+                </div>
+                <button onclick="get_details()" class="btn btn-primary">
+                    Parse
+                </button>
+                
+                    
+               
+            </div>
+            <div class="canvas">
+                <h1>Statement PDF file</h1>
+
+                <canvas id="the-canvas">
+                </canvas>
+            </div>
+            
+        </div>
+
+        <div class="split right">
+            <div class="cheque">
+                 <div>
+                    </div>
+                <br />
+                </br>
+                <div>
+                    <table>
+                        
+                            <tr>
+                                <th>Date</th>
+                                <th>Code</th>
+                                <th>Channel</th>
+                                <th>Cheque No</th>
+                                <th>Withdrwal (Debt)</th>
+                                <th>Deposit (Credit)</th>
+                                <th>Balance </th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>01/06/2022 10:52</td>
+                                <td>X2</td>
+                                <td>BCMS</td>
+                                <td></td>
+                                <td>10,800.00</td>
+                                <td></td>
+                                <td>79,077,978.90</td>
+                            </tr>
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const PDF_TYPE = "application/pdf";
+const TXT_TYPE = "text/plain";
+
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+
+function handleFileSelect(evt) {
+  var files = evt.target.files; // FileList object
+  for (var i = 0, f; f = files[i]; i++) {
+    let fileType = files[i].type;
+    if (fileType === PDF_TYPE) {
+      handlePDFFile(files[i]);
+    } else if (fileType === TXT_TYPE) {
+      handleTxtFile(files[i])
+    } else {
+      console.error(`cannot handle file type: ${fileType}`)
+    }
+  }
+}
+
+function handleTxtFile(file) {
+  var reader = new FileReader();
+  reader.onload = (function(reader) {
+    return function() {
+      var contents = reader.result;
+      var lines = contents.split('\n');
+
+      document.getElementById('container').innerHTML = contents;
+    }
+  })(reader);
+
+  reader.readAsText(file);
+}
+
+function handlePDFFile(file) {
+  var reader = new FileReader();
+
+  reader.onload = (function(reader) {
+    return function() {
+      var contents = reader.result;
+      var loadingTask = pdfjsLib.getDocument(contents);
+
+      loadingTask.promise.then(function(pdf) {
+        pdf.getPage(1).then(function(page) {
+          var scale = 1.5;
+          var viewport = page.getViewport({
+            scale: scale,
+          });
+
+          var canvas = document.getElementById('the-canvas');
+          var context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          var renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext);
+        });
+      });
+    }
+  })(reader);
+  reader.readAsDataURL(file);
+}
+    </script>
+
+<script>
+    let get_details = async () => {
+        var input = document.querySelector('input[type="file"]')
+
+        var data = new FormData()
+        data.append('file', input.files[0])
+        // data.append('user', 'hubot')
+
+       await fetch("/process", {
+            method: 'POST',
+            body: data
+        }).then(
+            response => response.json() // if the response is a JSON object
+        ).then(
+            success => console.log(success) // Handle the success response object
+        ).catch(
+            error => console.log(error) // Handle the error response object
+        );
+    }
+</script>
+</html>
