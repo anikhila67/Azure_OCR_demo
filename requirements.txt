@@ -1,3 +1,5 @@
 azure-core
 azure-ai-formrecognizer
 flask
+flask_bootstrap
+flask_wtf

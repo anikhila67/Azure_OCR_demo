@@ -24,6 +24,8 @@ document_analysis_client = DocumentAnalysisClient(
 
 app = Flask(__name__)
 # run_with_ngrok(app)
+# add CSS framwork to add css classes
+# Bootstrap is a css framework
 Bootstrap(app)
 
 
